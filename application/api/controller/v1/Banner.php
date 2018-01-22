@@ -20,7 +20,7 @@ class Banner
 
         $banner=BannerModel::getBannerByID($id);
         //隐藏模型字段
-        $banner->hidden(['update_time', 'delete_time']);
+//        $banner->hidden(['update_time', 'delete_time']);
 
         //基于ORM获取数据
 //        $banner=BannerModel::get($id);
