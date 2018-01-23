@@ -6,5 +6,6 @@
  * Time: 9:08
  */
 return[
-    'image_prefix'=>'http://z.cn/images'
+    'image_prefix'=>'http://z.cn/images',
+    'token_expire_in'=>7200
 ];
