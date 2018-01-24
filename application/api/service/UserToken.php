@@ -9,6 +9,7 @@
 namespace app\api\service;
 
 
+use app\lib\exception\TokenException;
 use app\lib\exception\WxException;
 use think\Exception;
 use app\api\model\User as UserModel;
@@ -40,14 +41,16 @@ class UserToken extends Token
             if ($loginFail) {
                 $this->processLoginError($wxResult);
             } else {
-
+                return $this->grantToken($wxResult);
             }
         }
     }
 
     private function grantToken($wxResult)
     {
+        //TODO:获取返回的openid
         $openid=$wxResult['openid'];
+        //TODO:检查数据库是否存在相同openid
         $user=UserModel::getByOpenID($openid);
         if($user){
             $uid=$user->id;
@@ -55,7 +58,10 @@ class UserToken extends Token
         else{
             $uid=$this->newUser($openid);
         }
+        //TODO:生成新的Token并写入缓存
         $cachedValue=$this->prepareCachedValue($wxResult, $uid);
+        $token=$this->saveToCache($cachedValue);
+        return $token;
     }
 
     private function saveToCache($cachedValue){
@@ -64,6 +70,10 @@ class UserToken extends Token
         $expire_in=config('setting.token_expire_in');
 
         $request=cache($key, $value, $expire_in);
+        if(!$request){
+            throw new TokenException();
+        }
+        return $key;
     }
 
     private function prepareCachedValue($wxResult, $uid){

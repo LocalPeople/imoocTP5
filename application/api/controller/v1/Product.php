@@ -38,4 +38,14 @@ class Product
         }
         return $products;
     }
+
+    public function getOne($id){
+        (new IDMustBePositiveInt())->goCheck();
+
+        $product=ProductModel::getProductDetail($id);
+        if (!$product) {
+            throw new ProductNotExistException();
+        }
+        return $product;
+    }
 }
