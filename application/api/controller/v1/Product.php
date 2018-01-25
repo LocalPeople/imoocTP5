@@ -24,6 +24,8 @@ class Product
         if ($products->isEmpty()) {
             throw new ProductNotExistException();
         }
+        //设置database.php->'resultset_type'='collection'
+        //collection类拥有hidden函数
         $products = $products->hidden(['summary']);
         return $products;
     }
@@ -47,5 +49,9 @@ class Product
             throw new ProductNotExistException();
         }
         return $product;
+    }
+
+    public function deleteOne($id){
+
     }
 }

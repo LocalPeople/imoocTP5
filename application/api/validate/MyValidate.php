@@ -51,4 +51,28 @@ class MyValidate extends Validate
             return true;
         }
     }
+
+    protected function isMobile($value){
+        $rule='/^1[3578][0-9]\d{8}$/';
+        $result=preg_match($rule, $value);
+        if($result){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function getDataByRule($array){
+        if(array_key_exists('user_id', $array)|array_key_exists('uid', $array)){
+            throw new ParameterException([
+                'msg'=>'参数中包含非法参数名user_id或uid'
+            ]);
+        }
+        $newArray=[];
+        foreach($this->rule as $key=>$value){
+            $newArray[$key]=$array[$key];
+        }
+        return $newArray;
+    }
 }
