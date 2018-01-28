@@ -6,7 +6,7 @@
  * Time: 16:58
  */
 
-namespace app\api\controller\v1;
+namespace app\api\controller;
 
 
 use app\lib\enum\ScopeEnum;
@@ -31,7 +31,7 @@ class BaseController extends Controller
             return true;
         }
         else{
-            throw new Exception('权限受限');
+            throw new \Exception('权限受限');
         }
     }
 }

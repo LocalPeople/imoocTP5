@@ -8,9 +8,12 @@
 
 namespace app\api\controller\v1;
 
+use app\api\controller\BaseController;
+use app\api\validate\OrderPlace;
 use app\api\service\Token as TokenService;
 
-class Order
+
+class Order extends BaseController
 {
     //查询相关商品库存信息
     //如果有库存，将订单数据写入数据库并返回可以支付信息回客户端
@@ -20,7 +23,13 @@ class Order
     //等待微信返回支付结果
     //成功：再再次检查库存，进行库存的扣除
 
-    public function placeOrder(){
+    protected $beforeActionList=[
+        'checkExclusiveScope'=>['only'=>'placeOrder']
+    ];
 
+    public function placeOrder(){
+        (new OrderPlace())->goCheck();
+        $products=input('post.products/a');
+        $uid=TokenService::getCurrentUid();
     }
 }
