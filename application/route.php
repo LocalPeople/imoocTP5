@@ -38,3 +38,5 @@ Route::post('api/:version/address', 'api/:version.address/createOrUpdateAddress'
 
 Route::post('api/:version/order', 'api/:version.order/placeOrder');
 
+Route::post('api/:version/pay/pre_order', 'api/:version.pay/getPreOrder');
+

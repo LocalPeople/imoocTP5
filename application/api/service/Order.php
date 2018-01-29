@@ -9,8 +9,10 @@
 namespace app\api\service;
 
 
+use app\api\model\OrderProduct;
 use app\api\model\Product;
 use app\api\model\UserAddress;
+use think\Db;
 
 class Order
 {
@@ -31,18 +33,53 @@ class Order
         }
         //TODO:开始创建订单
         $orderSnap = $this->snapOrder($status);
+        $order=$this->createOrder($orderSnap);
+        $order['pass']=true;
+        return $order;
     }
 
     private function createOrder($snap)
     {
+        try{
+            Db::startTrans();
+            $orderNo = self::makeOrderNum();
+            $order = new \app\api\model\Order();
+            $order->user_id = $this->uid;
+            $order->order_no = $orderNo;
+            $order->total_price = $snap['orderPrice'];
+            $order->total_count = $snap['totalCount'];
+            $order->snap_img = $snap['snapImg'];
+            $order->snap_name = $snap['snapName'];
+            $order->snap_address = $snap['snapAddress'];
+            $order->snap_items = json_encode($snap['pStatus']);
+            $order->save();
 
+            $orderID=$order->id;
+            $createTime=$order->create_time;
+            foreach ($this->oProducts as &$oProduct) {
+                $oProduct['order_id']=$orderID;
+            }
+            $orderProduct=new OrderProduct();
+            $orderProduct->saveAll($this->oProducts);
+            Db::commit();
+        }
+        catch(\Exception $e){
+            Db::rollback();
+            throw $e;
+        }
+
+        return [
+            'order_no' => $orderNo,
+            'order_id' => $orderID,
+            'create_time' => $createTime
+        ];
     }
 
     public static function makeOrderNum()
     {
         $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
         $orderSn =
-            $yCode[intval(date('y')) - 2017] . strtoupper(dechex(date('m')))
+            $yCode[intval(date('Y')) - 2017] . strtoupper(dechex(date('m')))
             . date('d') . substr(time(), -5) . substr(microtime(), 2, 5)
             . sprintf('%02d', rand(0, 99));
         return $orderSn;
@@ -79,6 +116,14 @@ class Order
             throw new \Exception('用户下单地址不存在，下单失败');
         }
         return $userAddress->toArray();
+    }
+
+    public function checkOrderStock($orderID){
+        $oProducts=OrderProduct::where('order_id', '=', $orderID)->select();
+        $this->oProducts=$oProducts;
+        $this->products=$this->getProductsByOrderProducts($oProducts);
+        $status=$this->getOrderStatus();
+        return $status;
     }
 
     private function getOrderStatus()
@@ -127,7 +172,7 @@ class Order
             $pStatus['count'] = $count;
             $pStatus['name'] = $product['name'];
             $pStatus['totalPrice'] = $product['price'] * $count;
-            if ($product['stock'] - count >= 0) {
+            if ($product['stock'] - $count >= 0) {
                 $pStatus['haveStock'] = true;
             }
             return $pStatus;
