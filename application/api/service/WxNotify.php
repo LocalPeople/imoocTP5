@@ -10,6 +10,7 @@ namespace app\api\service;
 
 use app\api\model\Product;
 use app\lib\enum\OrderStatusEnum;
+use think\Db;
 use think\Loader;
 use app\api\model\Order as OrderModel;
 use app\api\service\Order as OrderService;
@@ -23,6 +24,7 @@ class WxNotify extends \WxPayNotify
     {
         if ($data['result_code'] == 'SUCCESS') {
             $orderNo = $data['out_trade_no'];
+            Db::startTrans();//添加事务防止重复减少库存
             try {
                 $order = OrderModel::where('order_no', '=', $orderNo)
                     ->find();
@@ -36,13 +38,14 @@ class WxNotify extends \WxPayNotify
                         $this->updateOrderStatus($order->id, false);
                     }
                 }
+                Db::commit();
                 return true;
             } catch (\Exception $e) {
+                Db::rollback();
                 Log::error($e);
                 return false;
             }
-        }
-        else{
+        } else {
             return true;
         }
     }
