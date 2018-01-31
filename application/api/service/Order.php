@@ -118,6 +118,7 @@ class Order
         return $userAddress->toArray();
     }
 
+    //检查订单库存量
     public function checkOrderStock($orderID){
         $oProducts=OrderProduct::where('order_id', '=', $orderID)->select();
         $this->oProducts=$oProducts;

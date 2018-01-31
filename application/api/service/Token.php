@@ -44,4 +44,15 @@ class Token
     {
         return self::getCurrentTokenVar('uid');
     }
+
+    public static function isValidOperate($checkUID){
+        if(!$checkUID){
+            throw new \Exception('checkUID不能为null');
+        }
+        $currentOperateUID=self::getCurrentUid();
+        if($currentOperateUID==$checkUID){
+            return true;
+        }
+        return false;
+    }
 }

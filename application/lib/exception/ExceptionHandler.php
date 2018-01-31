@@ -28,18 +28,18 @@ class ExceptionHandler extends Handle
             $this->msg=$e->msg;
             $this->errorCode=$e->errorCode;
         }
+    else{
+        if(config('app_debug')){
+            return parent::render($e);
+    }
         else{
-            if(config('app_debug')){
-                return parent::render($e);
-            }
-            else{
-                $this->code=500;
-                $this->msg='服务器内部错误';
-                $this->errorCode=999;
-                //TODO:添加服务器内部错误日志
-                $this->recordErrorLog($e);
-            }
+            $this->code=500;
+            $this->msg='服务器内部错误';
+            $this->errorCode=999;
+            //TODO:添加服务器内部错误日志
+            $this->recordErrorLog($e);
         }
+    }
 
         $result=[
             'msg'=>$this->msg,

@@ -20,5 +20,7 @@ class Pay extends BaseController
 
     public function getPreOrder($id=''){
         (new IDMustBePositiveInt())->goCheck();
+        $payService=new \app\api\service\Pay($id);
+        return $payService->pay();
     }
 }
