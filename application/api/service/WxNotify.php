@@ -30,7 +30,7 @@ class WxNotify extends \WxPayNotify
                     ->find();
                 if (!$order && $order->status == OrderStatusEnum::UNPAID) {
                     $orderService = new OrderService();
-                    $status = $orderService->checkOrderStock($order->id);
+                    $status = $orderService->checkOrderStock($order->id);//最后一次库存检查
                     if ($status['pass']) {
                         $this->updateOrderStatus($order->id, true);
                         $this->reduceStock($status);
