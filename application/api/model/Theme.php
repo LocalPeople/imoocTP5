@@ -24,6 +24,7 @@ class Theme extends BaseModel
     }
 
     public function products(){
+        //多对多关联查询（附加多对多关联表）
         return $this->belongsToMany('Product', 'theme_product', 'product_id', 'theme_id');
     }
 }
