@@ -55,4 +55,14 @@ class Token
         }
         return false;
     }
+
+    public static function verify($token){
+        $exist=Cache::get($token);
+        if($exist){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
