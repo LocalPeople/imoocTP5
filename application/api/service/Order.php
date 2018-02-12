@@ -33,14 +33,14 @@ class Order
         }
         //TODO:开始创建订单
         $orderSnap = $this->snapOrder($status);
-        $order=$this->createOrder($orderSnap);
-        $order['pass']=true;
+        $order = $this->createOrder($orderSnap);
+        $order['pass'] = true;
         return $order;
     }
 
     private function createOrder($snap)
     {
-        try{
+        try {
             Db::startTrans();
             $orderNo = self::makeOrderNum();
             $order = new \app\api\model\Order();
@@ -54,16 +54,15 @@ class Order
             $order->snap_items = json_encode($snap['pStatus']);
             $order->save();
 
-            $orderID=$order->id;
-            $createTime=$order->create_time;
+            $orderID = $order->id;
+            $createTime = $order->create_time;
             foreach ($this->oProducts as &$oProduct) {
-                $oProduct['order_id']=$orderID;
+                $oProduct['order_id'] = $orderID;
             }
-            $orderProduct=new OrderProduct();
+            $orderProduct = new OrderProduct();
             $orderProduct->saveAll($this->oProducts);
             Db::commit();
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             Db::rollback();
             throw $e;
         }
@@ -119,11 +118,12 @@ class Order
     }
 
     //检查订单库存量
-    public function checkOrderStock($orderID){
-        $oProducts=OrderProduct::where('order_id', '=', $orderID)->select();
-        $this->oProducts=$oProducts;
-        $this->products=$this->getProductsByOrderProducts($oProducts);
-        $status=$this->getOrderStatus();
+    public function checkOrderStock($orderID)
+    {
+        $oProducts = OrderProduct::where('order_id', '=', $orderID)->select();
+        $this->oProducts = $oProducts;
+        $this->products = $this->getProductsByOrderProducts($oProducts);
+        $status = $this->getOrderStatus();
         return $status;
     }
 
@@ -156,8 +156,10 @@ class Order
             'id' => null,
             'haveStock' => false,
             'count' => 0,
+            'price' => 0,
             'name' => '',
-            'totalPrice' => 0
+            'totalPrice' => 0,
+            'main_img_url' => null
         ];
         for ($i = 0; $i < count($products); $i++) {
             if ($oPID == $products[$i]['id']) {
@@ -171,8 +173,10 @@ class Order
             $product = $products[$pIndex];
             $pStatus['id'] = $product['id'];
             $pStatus['count'] = $count;
+            $pStatus['price'] = $product['price'];
             $pStatus['name'] = $product['name'];
             $pStatus['totalPrice'] = $product['price'] * $count;
+            $pStatus['main_img_url'] = $product['main_img_url'];
             if ($product['stock'] - $count >= 0) {
                 $pStatus['haveStock'] = true;
             }
