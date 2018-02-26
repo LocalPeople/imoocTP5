@@ -34,12 +34,14 @@ Route::get('api/:version/category/all', 'api/:version.category/getAllCategory');
 
 Route::post('api/:version/token/user', 'api/:version.token/getToken');
 Route::post('api/:version/token/verify', 'api/:version.token/verify');
+Route::post('api/:version/token/app', 'api/:version.token/getAppToken');
 
 Route::post('api/:version/address', 'api/:version.address/createOrUpdateAddress');
 Route::get('api/:version/address', 'api/:version.address/getUserAddress');
 
 Route::post('api/:version/order', 'api/:version.order/placeOrder');
-Route::post('api/:version/order/by_user', 'api/:version.order/getSummaryByUser');
+Route::get('api/:version/order/by_user', 'api/:version.order/getSummaryByUser');
+Route::get('api/:version/order/paginate', 'api/:version.order/getSummary');
 Route::get('api/:version/order/:id', 'api/:version.order/getDetail', [], ['id'=>'\d+']);
 
 Route::post('api/:version/pay/pre_order', 'api/:version.pay/getPreOrder');

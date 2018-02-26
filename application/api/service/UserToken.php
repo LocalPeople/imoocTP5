@@ -72,7 +72,10 @@ class UserToken extends Token
 
         $request = cache($key, $value, $expire_in);
         if (!$request) {
-            throw new TokenException();
+            throw new TokenException([
+                'msg'=>'服务器缓存异常',
+                'errorCode'=>10005
+            ]);
         }
         return $key;
     }
